@@ -1,0 +1,44 @@
+{
+  "name": "reqlens",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Edge/Chromium extension: an always-on-top in-page overlay to inspect, edit and replay the HTTP requests a page makes.",
+  "type": "module",
+  "license": "MIT",
+  "scripts": {
+    "setup": "node scripts/setup.mjs",
+    "build": "node scripts/build.mjs",
+    "build:e2e": "node scripts/build.mjs --e2e",
+    "watch": "node scripts/build.mjs --watch",
+    "typecheck": "tsc --noEmit -p tsconfig.json && tsc --noEmit -p tests/e2e/tsconfig.json && tsc --noEmit -p mcp/tsconfig.json",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:e2e": "npm run build:e2e && npm run build:mcp && playwright test",
+    "icons": "node scripts/gen-icons.mjs",
+    "zip": "npm run build && node scripts/zip.mjs",
+    "check": "npm run typecheck && npm test && npm run build && npm run build:mcp",
+    "build:mcp": "node scripts/build-mcp.mjs",
+    "mcp:install": "node scripts/build-mcp.mjs && node mcp/dist/reqlens-mcp.mjs install"
+  },
+  "allowScripts": {
+    "esbuild": true,
+    "fsevents": true,
+    "node-pty": true
+  },
+  "dependencies": {
+    "node-pty": "^1.1.0",
+    "preact": "^10.29.8"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/sdk": "^1.31.0",
+    "@playwright/test": "^1.63.0",
+    "@types/chrome": "^0.3.4",
+    "@types/node": "^24.0.0",
+    "@xterm/addon-fit": "^0.11.0",
+    "@xterm/xterm": "^6.0.0",
+    "esbuild": "^0.25.12",
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11",
+    "zod": "^3.25.76"
+  }
+}

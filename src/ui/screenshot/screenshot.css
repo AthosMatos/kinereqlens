@@ -1,0 +1,577 @@
+/* Screenshot tool (src/ui/screenshot/ScreenshotTool.tsx). Uses only the shared tokens (styles/tokens.css), so it
+ * follows the light and dark themes of the enclosing .rl-root. */
+
+.rl-shot {
+  /* Positioning box of the "Send to Claude" dialog (the result view itself can be short). */
+  position: relative;
+  container-type: inline-size;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rl-space-2);
+  min-width: 0;
+  min-height: 0;
+  height: 100%;
+  padding: var(--rl-space-2);
+  background: var(--rl-bg);
+  color: var(--rl-text);
+  font-size: var(--rl-fs-sm);
+  pointer-events: auto;
+}
+.rl-shot:focus {
+  outline: none;
+}
+
+/* ------------------------------------------------------------------------------------------ bars */
+.rl-shot__bar,
+.rl-shot__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.rl-shot__title {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: 2px;
+  color: var(--rl-text);
+  font-size: var(--rl-fs-md);
+  font-weight: 600;
+}
+.rl-shot__title .rl-icon {
+  color: var(--rl-accent);
+}
+.rl-shot__sep {
+  flex: none;
+  width: 1px;
+  height: 18px;
+  background: var(--rl-border);
+}
+
+/* Segmented control (modes, tools) */
+.rl-shot__seg {
+  display: inline-flex;
+  flex: none;
+  padding: 2px;
+  gap: 2px;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius-sm);
+  background: var(--rl-bg-sunken);
+}
+.rl-shot__seg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 22px;
+  padding: 0 7px;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: var(--rl-text-muted);
+  font: 500 var(--rl-fs-xs) / 1 var(--rl-font);
+  white-space: nowrap;
+  transition:
+    background-color var(--rl-dur-fast) ease,
+    color var(--rl-dur-fast) ease;
+}
+.rl-shot__seg-btn:hover:not(:disabled) {
+  background: var(--rl-bg-hover);
+  color: var(--rl-text);
+}
+.rl-shot__seg-btn[aria-checked='true'],
+.rl-shot__seg-btn[aria-pressed='true'] {
+  border-color: color-mix(in srgb, var(--rl-accent) 26%, transparent);
+  background: var(--rl-bg-elev);
+  color: var(--rl-accent);
+  box-shadow: var(--rl-shadow-sm);
+}
+.rl-shot__seg-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rl-shot__seg-btn--icon {
+  width: 24px;
+  padding: 0;
+  justify-content: center;
+}
+@container (max-width: 520px) {
+  .rl-shot__mode-label {
+    display: none;
+  }
+  .rl-shot__seg-btn {
+    padding: 0 6px;
+  }
+}
+
+.rl-shot__select {
+  height: 26px;
+  max-width: 170px;
+}
+.rl-shot__swatch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid transparent;
+  border-radius: 50%;
+}
+.rl-shot__swatch::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: var(--rl-swatch);
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.15);
+}
+.rl-shot__swatch:hover {
+  background: var(--rl-bg-hover);
+}
+.rl-shot__swatch[aria-pressed='true'] {
+  border-color: var(--rl-swatch);
+}
+.rl-shot__zoom {
+  min-width: 46px;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ---------------------------------------------------------------------------------------- status */
+.rl-shot__status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 18px;
+  color: var(--rl-text-muted);
+  font-size: var(--rl-fs-xs);
+}
+.rl-shot__progress {
+  flex: 0 1 120px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: var(--rl-bg-active);
+}
+.rl-shot__progress > span {
+  display: block;
+  height: 100%;
+  background: var(--rl-accent);
+  transition: width var(--rl-dur) var(--rl-ease);
+}
+
+/* ---------------------------------------------------------------------------------------- result */
+.rl-shot__result {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 0;
+}
+.rl-shot__stage {
+  position: relative;
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 120px;
+  overflow: auto;
+  padding: var(--rl-space-3);
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius-sm);
+  background-color: var(--rl-bg-sunken);
+  background-image:
+    linear-gradient(45deg, var(--rl-backdrop) 25%, transparent 25%, transparent 75%, var(--rl-backdrop) 75%),
+    linear-gradient(45deg, var(--rl-backdrop) 25%, transparent 25%, transparent 75%, var(--rl-backdrop) 75%);
+  background-position:
+    0 0,
+    8px 8px;
+  background-size: 16px 16px;
+  overscroll-behavior: contain;
+}
+.rl-shot__stage:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: -2px;
+}
+.rl-shot__canvas-wrap {
+  position: relative;
+  flex: none;
+  margin: auto;
+  box-shadow:
+    0 0 0 1px var(--rl-border-strong),
+    0 6px 18px -6px rgba(0, 0, 0, 0.32);
+  touch-action: none;
+}
+.rl-shot__canvas-wrap[data-tool='none'] {
+  cursor: grab;
+}
+.rl-shot__canvas-wrap[data-tool='none'][data-panning] {
+  cursor: grabbing;
+}
+.rl-shot__canvas-wrap[data-tool='rect'],
+.rl-shot__canvas-wrap[data-tool='arrow'],
+.rl-shot__canvas-wrap[data-tool='pixelate'] {
+  cursor: crosshair;
+}
+.rl-shot__canvas-wrap[data-tool='text'] {
+  cursor: text;
+}
+.rl-shot__canvas {
+  display: block;
+  max-width: none;
+  width: 100%;
+  height: 100%;
+}
+.rl-shot__text-input {
+  position: absolute;
+  z-index: 1;
+  min-width: 140px;
+  height: auto;
+  padding: 2px 4px;
+  border: 1px dashed var(--rl-accent);
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--rl-bg-elev) 85%, transparent);
+  font-weight: 600;
+  line-height: 1.2;
+}
+.rl-shot__meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 10px;
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+}
+.rl-shot__meta strong {
+  color: var(--rl-text-muted);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.rl-shot__meta-warn {
+  color: var(--rl-warn);
+}
+.rl-shot__meta-note {
+  color: var(--rl-text-muted);
+}
+
+/* --------------------------------------------------------------------------------------- padding */
+/* Padding of an element / region capture (PaddingControl.tsx) and the Element mode's default padding. */
+.rl-shot__padding {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  min-width: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius-sm);
+  background: var(--rl-bg-sunken);
+  font-size: var(--rl-fs-xs);
+}
+.rl-shot__padding-label {
+  color: var(--rl-text-muted);
+  font-weight: 600;
+}
+.rl-shot__padding-range {
+  flex: 1 1 140px;
+  min-width: 100px;
+  max-width: 320px;
+}
+.rl-shot__padding-input {
+  width: 64px;
+  height: 24px;
+  padding: 0 6px;
+  font-variant-numeric: tabular-nums;
+}
+.rl-shot__padding-hint {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  color: var(--rl-text-faint);
+}
+.rl-shot__padding[data-short] .rl-shot__padding-hint {
+  color: var(--rl-warn);
+}
+.rl-shot__padding-default {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--rl-text-muted);
+  font-size: var(--rl-fs-xs);
+}
+.rl-shot__padding-default .rl-shot__padding-input {
+  width: 56px;
+}
+
+/* ---------------------------------------------------------------------------------------- recent */
+.rl-shot__recent {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  padding-top: 6px;
+  border-top: 1px solid var(--rl-border);
+}
+.rl-shot__recent-label {
+  flex: none;
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.rl-shot__strip {
+  display: flex;
+  flex: 1 1 auto;
+  gap: 6px;
+  min-width: 0;
+  overflow-x: auto;
+  padding: 2px;
+}
+.rl-shot__thumb {
+  position: relative;
+  flex: none;
+  width: 64px;
+  height: 44px;
+  overflow: hidden;
+  border: 1px solid var(--rl-border-strong);
+  border-radius: 4px;
+  background: var(--rl-bg-sunken);
+}
+.rl-shot__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top left;
+}
+.rl-shot__thumb:hover {
+  border-color: var(--rl-text-faint);
+}
+.rl-shot__thumb[aria-pressed='true'] {
+  border-color: var(--rl-accent);
+  box-shadow: 0 0 0 2px var(--rl-accent-soft);
+}
+.rl-shot__thumb-mode {
+  position: absolute;
+  right: 2px;
+  bottom: 2px;
+  padding: 1px 3px;
+  border-radius: 3px;
+  background: rgba(0, 0, 0, 0.66);
+  color: #fff;
+  font: 600 9px / 1.2 var(--rl-font);
+}
+
+.rl-shot__empty {
+  flex: 1 1 auto;
+  border: 1px dashed var(--rl-border-strong);
+  border-radius: var(--rl-radius-sm);
+}
+.rl-shot__empty .rl-kbd {
+  margin: 0 2px;
+}
+
+@media (forced-colors: active) {
+  .rl-shot__seg-btn[aria-checked='true'],
+  .rl-shot__seg-btn[aria-pressed='true'],
+  .rl-shot__thumb[aria-pressed='true'],
+  .rl-shot__swatch[aria-pressed='true'] {
+    outline: 2px solid Highlight;
+  }
+}
+
+/* ------------------------------------------------------------------------------------------ send to Claude */
+.rl-shot__send-backdrop {
+  /* Over the screenshot tool (its nearest positioned ancestor: .rl-shot, or the Errors view's screenshot dialog). */
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  display: grid;
+  place-items: center;
+  padding: 12px;
+  background: var(--rl-backdrop);
+}
+.rl-shot__send {
+  display: flex;
+  flex-direction: column;
+  width: min(520px, 100%);
+  max-height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--rl-border-strong);
+  border-radius: var(--rl-radius);
+  background: var(--rl-bg-elev);
+  box-shadow: var(--rl-shadow);
+  color: var(--rl-text);
+}
+.rl-shot__send-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px 8px 12px;
+  border-bottom: 1px solid var(--rl-border);
+}
+.rl-shot__send-head > .rl-icon {
+  color: var(--rl-accent);
+}
+.rl-shot__send-title {
+  font-size: var(--rl-fs-md);
+  font-weight: 600;
+}
+.rl-shot__send-body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  padding: 10px 12px 12px;
+  overflow: auto;
+}
+.rl-shot__send-body > * {
+  /* The body scrolls when the dialog is short; its parts keep their size. */
+  flex: none;
+}
+.rl-shot__send-label {
+  color: var(--rl-text-muted);
+  font-size: var(--rl-fs-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.rl-shot__send-targets {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 160px;
+  overflow: auto;
+}
+.rl-shot__send-target {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 8px;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius-sm);
+  background: var(--rl-bg);
+  color: var(--rl-text);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rl-shot__send-target:hover:not(:disabled) {
+  background: var(--rl-bg-hover);
+}
+.rl-shot__send-target[aria-checked='true'] {
+  border-color: var(--rl-accent);
+  background: var(--rl-accent-soft);
+  box-shadow: inset 3px 0 0 var(--rl-accent);
+}
+.rl-shot__send-target:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: 1px;
+}
+.rl-shot__send-target > .rl-icon {
+  flex: none;
+  color: var(--rl-text-muted);
+}
+.rl-shot__send-target-label {
+  flex: 0 1 auto;
+  font-weight: 600;
+}
+.rl-shot__send-target-detail {
+  flex: 1 1 0;
+  min-width: 0;
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+}
+.rl-shot__send-unavailable,
+.rl-shot__send-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 6px;
+  padding: 6px 8px;
+  border-radius: var(--rl-radius-sm);
+  background: var(--rl-warn-soft);
+  color: var(--rl-text);
+  font-size: var(--rl-fs-sm);
+}
+.rl-shot__send-error {
+  background: var(--rl-danger-soft);
+}
+.rl-shot__send-unavailable > .rl-icon,
+.rl-shot__send-error > .rl-icon {
+  flex: none;
+  align-self: center;
+}
+.rl-shot__send-unavailable > span {
+  flex: 1 1 0;
+  min-width: 0;
+}
+.rl-shot__send-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.rl-shot__send-chip {
+  padding: 2px 8px;
+  border: 1px solid var(--rl-border);
+  border-radius: 999px;
+  background: var(--rl-bg-sunken);
+  color: var(--rl-text-muted);
+  font: var(--rl-fs-xs) / 1.6 var(--rl-font);
+  cursor: pointer;
+}
+.rl-shot__send-chip:hover:not(:disabled) {
+  border-color: var(--rl-accent);
+  color: var(--rl-accent);
+}
+.rl-shot__send-chip:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: 1px;
+}
+.rl-shot__send-prompt {
+  min-height: 72px;
+  resize: vertical;
+}
+.rl-shot__send-context {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rl-shot__send-check {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: var(--rl-fs-sm);
+  cursor: pointer;
+}
+.rl-shot__send-check > span:nth-of-type(1) {
+  flex: none;
+}
+.rl-shot__send-check-detail {
+  flex: 1 1 0;
+  min-width: 0;
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+}
+.rl-shot__send-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  padding-top: 4px;
+}
+.rl-shot__send-done {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--rl-ok);
+  font-weight: 600;
+}
+.rl-shot__send-path {
+  display: flex;
+  gap: 6px;
+}
+.rl-shot__send-path > .rl-input {
+  flex: 1 1 0;
+  min-width: 0;
+}

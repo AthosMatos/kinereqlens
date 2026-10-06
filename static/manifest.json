@@ -1,0 +1,81 @@
+{
+  "manifest_version": 3,
+  "name": "kineReqLens \u2014 HTTP Request Overlay",
+  "short_name": "kineReqLens",
+  "version": "0.0.0",
+  "description": "Always-on-top overlay to capture, edit and replay a page's HTTP requests (query, headers, body) and inspect the responses.",
+  "minimum_chrome_version": "116",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA1Y9fQg0pDQqLgXzEJOBNnN+YFADjuvOtz/I2HW8iJo3OOTMpNq4fRN+hRoaXzlhAbABGiajc6n4peWg6RbCpvqh59ydnWxFVdAUVWpLzECPd4qV22UGwaM2vZ/K6mhveKG+JT88m95NtY7GP7ZVLjNCUfYBHXGZlhhM5scapzffgEQSJJAg6sEzhKrwBm/6ssfPkFgh4fcegIe95VtQnKjcYUKa6Vwof7rIzf3YW6ZKQBWwuT9gddMpu2yzA/mrew5qU/HvxfveHnDD+vkbneL2j3n/0iYTC9Lt3sZH57WMuiYB+4b/NAWsr9GkkvB6eHIM3PgPGcnc+fOYFGKMA1QIDAQAB",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Toggle kineReqLens overlay (Alt+Shift+L)",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png",
+      "48": "icons/icon-48.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "permissions": [
+    "storage",
+    "scripting",
+    "webRequest",
+    "declarativeNetRequestWithHostAccess",
+    "nativeMessaging"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "hook.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true,
+      "match_origin_as_fallback": true,
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true,
+      "match_about_blank": true,
+      "match_origin_as_fallback": true
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "panel.html"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ],
+  "commands": {
+    "_execute_action": {
+      "suggested_key": {
+        "default": "Alt+Shift+L"
+      },
+      "description": "Toggle the kineReqLens overlay"
+    }
+  }
+}

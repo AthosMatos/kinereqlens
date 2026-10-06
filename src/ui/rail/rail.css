@@ -1,0 +1,283 @@
+/* OWNER: ui-shell agent. Navigation rail (src/ui/rail/Rail.tsx): the panel's left edge, under the header.
+ * 44 px with icons only, 180 px with labels (keep RAIL_W / RAIL_EXPANDED_W in Rail.tsx in sync).
+ * KineMeet's icon rail: the darkest surface, rounded-square (12 px) buttons, a soft filled square for the current
+ * view (no outline, no edge bar). */
+
+/* Header + (rail | body) */
+.rl-panel__frame {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 0;
+}
+.rl-panel__frame > .rl-panel__body {
+  flex: 1 1 auto;
+}
+
+.rl-rail {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 44px;
+  min-height: 0;
+  border-right: 1px solid var(--rl-border);
+  background: var(--rl-rail-bg);
+  user-select: none;
+  transition: width var(--rl-dur) var(--rl-ease);
+}
+.rl-rail--expanded {
+  width: 180px;
+}
+.rl-panel--dragging .rl-rail,
+.rl-panel--resizing .rl-rail {
+  transition: none;
+}
+
+.rl-rail__bar {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 3px;
+  min-height: 0;
+  padding: 6px 4px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  scrollbar-width: none;
+}
+.rl-rail__bar::-webkit-scrollbar {
+  display: none;
+}
+.rl-rail__group {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.rl-rail__slot {
+  position: relative;
+  display: flex;
+  flex: none;
+  min-width: 0;
+}
+.rl-rail__slot > .rl-popup-anchor {
+  display: flex;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.rl-rail__spacer {
+  flex: 1 1 auto;
+  min-height: 10px;
+  margin: 0 6px 4px;
+  border-bottom: 1px solid var(--rl-border);
+}
+
+/* ---- items */
+.rl-rail__btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  min-width: 0;
+  height: 34px;
+  /* The 17 px icon is centred on the collapsed rail (4 + 9.5 + 8.5 = 22 px) and stays put when it expands. */
+  padding: 0 7px 0 9.5px;
+  border: 0;
+  border-radius: var(--rl-radius-lg);
+  background: transparent;
+  color: var(--rl-text-muted);
+  font: 400 var(--rl-fs-md) / 1 var(--rl-font);
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--rl-dur-fast) ease,
+    color var(--rl-dur-fast) ease;
+}
+.rl-rail__btn:hover {
+  background: var(--rl-rail-hover);
+  color: var(--rl-text);
+}
+/* Icons a step fainter than the labels (Kineloop's navigation), the accent on the current view / open tool. */
+.rl-rail__btn .rl-rail__icon {
+  color: var(--rl-text-faint);
+}
+.rl-rail__btn:hover .rl-rail__icon {
+  color: var(--rl-text-muted);
+}
+.rl-rail__btn:active {
+  background: var(--rl-rail-active);
+}
+.rl-rail__btn:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: -2px;
+}
+.rl-rail__slot--minor .rl-rail__btn {
+  height: 30px;
+  color: var(--rl-text-faint);
+}
+.rl-rail__slot--minor .rl-rail__btn:hover {
+  color: var(--rl-text);
+}
+
+/* Current view: the soft filled square (white on the light rail, raised charcoal on the dark one), accent icon. */
+.rl-rail__btn[aria-current='page'] {
+  background: var(--rl-rail-active);
+  color: var(--rl-text-strong);
+  font-weight: 600;
+  box-shadow: var(--rl-rail-active-shadow, none);
+}
+.rl-rail__btn[aria-current='page'] .rl-rail__icon {
+  color: var(--rl-accent);
+}
+.rl-root[data-theme='light'] .rl-rail {
+  --rl-rail-active-shadow: 0 1px 2px rgba(0, 0, 0, 0.06), 0 0 0 1px rgba(0, 0, 0, 0.03);
+}
+/* Open tool (terminal pane shown, Setups / Settings popover open). */
+.rl-rail__btn[aria-pressed='true'],
+.rl-rail__btn[aria-haspopup][aria-expanded='true'] {
+  background: var(--rl-rail-active);
+  color: var(--rl-text);
+}
+.rl-rail__btn[aria-pressed='true'] .rl-rail__icon,
+.rl-rail__btn[aria-haspopup][aria-expanded='true'] .rl-rail__icon {
+  color: var(--rl-accent);
+}
+.rl-rail__btn[data-available='false']:not([aria-pressed='true']) .rl-rail__icon > .rl-icon {
+  opacity: 0.6;
+}
+
+.rl-rail__icon {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+}
+.rl-rail__label {
+  flex: 1 1 auto;
+  min-width: 0;
+  letter-spacing: -0.005em;
+}
+.rl-rail:not(.rl-rail--expanded) .rl-rail__label {
+  display: none;
+}
+
+/* ---- count badge: a pill after the label, or on the icon's corner when collapsed */
+.rl-rail__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-width: 18px;
+  height: 16px;
+  padding: 0 5px;
+  border-radius: var(--rl-radius-pill);
+  background: var(--rl-bg-active);
+  color: var(--rl-text-muted);
+  font: 600 10.5px / 1 var(--rl-font);
+  font-variant-numeric: tabular-nums;
+}
+.rl-rail__badge[data-zero='true'] {
+  background: transparent;
+  color: var(--rl-text-faint);
+}
+.rl-rail__btn[aria-current='page'] .rl-rail__badge {
+  background: var(--rl-accent);
+  color: var(--rl-accent-contrast);
+}
+/* Collapsed: a small pill on the icon's top-right corner (it overlaps only the corner of the glyph). */
+.rl-rail:not(.rl-rail--expanded) .rl-rail__badge {
+  position: absolute;
+  top: 0;
+  left: 21px;
+  min-width: 14px;
+  height: 13px;
+  padding: 0 3.5px;
+  font-size: 9px;
+  letter-spacing: -0.02em;
+  box-shadow: 0 0 0 1.5px var(--rl-rail-bg);
+  pointer-events: none;
+}
+.rl-rail:not(.rl-rail--expanded) .rl-rail__badge[data-zero='true'] {
+  display: none;
+}
+.rl-rail:not(.rl-rail--expanded) .rl-rail__btn[aria-current='page'] .rl-rail__badge {
+  background: var(--rl-accent);
+  color: var(--rl-accent-contrast);
+}
+
+/* ---- status dots on the icon (live sockets, running terminals, modified setup) */
+.rl-rail__dot {
+  position: absolute;
+  bottom: -2px;
+  right: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rl-ok);
+  box-shadow: 0 0 0 1.5px var(--rl-rail-bg);
+}
+.rl-rail__dot--new {
+  top: -2px;
+  bottom: auto;
+  background: var(--rl-danger);
+}
+.rl-rail__dot--modified {
+  top: -2px;
+  bottom: auto;
+  background: var(--rl-modified);
+}
+.rl-rail__dot--live::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: var(--rl-ok);
+  animation: rl-pulse 1.8s var(--rl-ease) infinite;
+}
+.rl-rail__btn:hover .rl-rail__dot,
+.rl-rail__btn:hover .rl-rail__badge {
+  box-shadow: 0 0 0 1.5px var(--rl-rail-hover);
+}
+.rl-rail__btn[aria-current='page'] .rl-rail__dot,
+.rl-rail__btn[aria-current='page'] .rl-rail__badge,
+.rl-rail__btn[aria-pressed='true'] .rl-rail__dot,
+.rl-rail__btn[aria-haspopup][aria-expanded='true'] .rl-rail__dot {
+  box-shadow: 0 0 0 1.5px var(--rl-rail-active);
+}
+.rl-rail--expanded .rl-rail__btn .rl-rail__badge {
+  box-shadow: none;
+}
+
+/* ---- popovers opened from the rail (Settings, Setups) slide in from the left */
+.rl-popup--right {
+  transform-origin: left top;
+  animation-name: rl-pop-in-right;
+}
+@keyframes rl-pop-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(-4px) scale(0.98);
+  }
+}
+
+/* ---- Settings popover: title row with the "Claude Code" shortcut */
+.rl-settings__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rl-space-2);
+}
+.rl-settings__jump {
+  gap: 5px;
+  border-color: var(--rl-border);
+}
+
+/* ---- narrow panels: a compact header */
+.rl-panel--compact .rl-header__title {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-rail__dot--live::after {
+    animation: none;
+  }
+}

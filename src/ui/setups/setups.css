@@ -1,0 +1,458 @@
+/* Setups: the header button (active setup + modified dot) and the Setups popover (src/ui/setups/**). */
+
+/* ------------------------------------------------------------------------------- header button */
+.rl-setups-btn {
+  max-width: 200px;
+  gap: 5px;
+}
+.rl-setups-btn--active {
+  color: var(--rl-text);
+}
+.rl-setups-btn--active > .rl-icon:first-child,
+.rl-setups-btn--active > svg:first-child {
+  color: var(--rl-accent);
+}
+.rl-setups-btn__name {
+  min-width: 0;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rl-panel--narrow .rl-setups-btn__name {
+  max-width: 72px;
+}
+.rl-setups-btn__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rl-modified);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--rl-modified) 22%, transparent);
+}
+
+/* ------------------------------------------------------------------------------- popover */
+.rl-setups-popover {
+  width: min(360px, calc(100vw - 16px));
+  max-width: min(360px, calc(100vw - 16px));
+}
+.rl-setups {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rl-space-2);
+  padding: var(--rl-space-2) var(--rl-space-2) var(--rl-space-3);
+  font: 400 var(--rl-fs-sm) / 1.35 var(--rl-font);
+}
+.rl-setups .rl-input--sm {
+  height: 24px;
+  padding: 0 7px;
+  font-size: var(--rl-fs-sm);
+}
+.rl-setups__head {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 0 0 var(--rl-space-1);
+}
+.rl-setups__title {
+  color: var(--rl-text-strong);
+  font: 600 var(--rl-fs-lg) / 1 var(--rl-font);
+}
+.rl-setups__count {
+  margin-left: 6px;
+  padding: 2px 6px;
+  border-radius: var(--rl-radius-pill);
+  background: var(--rl-bg-active);
+  color: var(--rl-text-muted);
+  font: 600 var(--rl-fs-xs) / 1 var(--rl-font);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Active setup bar */
+.rl-setups__active {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 6px var(--rl-space-2);
+  border: 1px solid color-mix(in srgb, var(--rl-accent) 30%, var(--rl-border));
+  border-radius: var(--rl-radius);
+  background: var(--rl-accent-soft);
+}
+.rl-setups__active--modified {
+  border-color: color-mix(in srgb, var(--rl-modified) 45%, var(--rl-border));
+  background: var(--rl-warn-soft);
+}
+.rl-setups__active-line {
+  display: flex;
+  align-items: center;
+  gap: var(--rl-space-2);
+  min-width: 0;
+}
+.rl-setups__active-label {
+  flex: none;
+  color: var(--rl-accent);
+  font: var(--rl-label-fw) var(--rl-label-fs) / 1 var(--rl-font);
+  letter-spacing: var(--rl-label-ls);
+  text-transform: uppercase;
+}
+.rl-setups__active--modified .rl-setups__active-label {
+  color: var(--rl-warn);
+}
+.rl-setups__active-name {
+  min-width: 0;
+  font-weight: 600;
+}
+.rl-setups__active-actions {
+  display: flex;
+  align-items: center;
+  gap: var(--rl-space-1);
+  min-width: 0;
+}
+.rl-setups__update {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+/* "Save current as…" */
+.rl-setups__save-open {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 28px;
+  border: 1px dashed var(--rl-border-strong);
+  border-radius: var(--rl-radius);
+  color: var(--rl-text-muted);
+  font: 600 var(--rl-fs-sm) / 1 var(--rl-font);
+  transition:
+    background-color var(--rl-dur-fast) ease,
+    border-color var(--rl-dur-fast) ease,
+    color var(--rl-dur-fast) ease;
+}
+.rl-setups__save-open:hover:not(:disabled) {
+  border-color: var(--rl-accent);
+  background: var(--rl-accent-soft);
+  color: var(--rl-accent);
+}
+.rl-setups__save-open:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.rl-setups__form,
+.rl-setups__import,
+.rl-setup__editor {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  padding: var(--rl-space-2);
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-bg-sunken);
+}
+.rl-setups__field {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.rl-setups__field > .rl-input {
+  width: 100%;
+}
+.rl-setups__label {
+  color: var(--rl-text-faint);
+  font: 400 var(--rl-fs-xs) / 1.2 var(--rl-font);
+}
+.rl-setups__check {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  font-size: var(--rl-fs-sm);
+  cursor: pointer;
+}
+.rl-setups__check .rl-mono {
+  font-size: var(--rl-fs-xs);
+}
+.rl-setups__error {
+  color: var(--rl-danger);
+  font-size: var(--rl-fs-xs);
+}
+.rl-setups__hint {
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+}
+.rl-setups__form-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--rl-space-1);
+  min-width: 0;
+}
+.rl-setups__suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 2px;
+}
+.rl-setups__suggestion {
+  max-width: 100%;
+  height: 20px;
+  padding: 0 8px;
+  overflow: hidden;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius-pill);
+  background: var(--rl-bg-elev);
+  color: var(--rl-text-muted);
+  font: 500 var(--rl-fs-xs) / 1 var(--rl-font);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rl-setups__suggestion:hover {
+  border-color: var(--rl-accent);
+  color: var(--rl-accent);
+}
+.rl-setups__search {
+  flex: none;
+}
+.rl-setups__search .rl-search__input {
+  padding-right: 8px;
+  font-family: var(--rl-font);
+}
+
+/* Import */
+.rl-setups__import-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-weight: 600;
+}
+.rl-setups__import-text {
+  color: var(--rl-text-muted);
+  font-size: var(--rl-fs-xs);
+}
+.rl-setups__choices {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rl-setups__choice {
+  display: flex;
+  align-items: flex-start;
+  gap: 7px;
+  padding: 5px 6px;
+  border: 1px solid transparent;
+  border-radius: var(--rl-radius);
+  cursor: pointer;
+}
+.rl-setups__choice:hover {
+  background: var(--rl-bg-hover);
+}
+.rl-setups__choice:has(input:checked) {
+  border-color: color-mix(in srgb, var(--rl-accent) 40%, var(--rl-border));
+  background: var(--rl-accent-soft);
+}
+.rl-setups__choice input {
+  margin: 2px 0 0;
+  accent-color: var(--rl-accent);
+}
+.rl-setups__choice > span {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.rl-setups__choice-note {
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+}
+
+/* Empty states */
+.rl-setups__empty {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--rl-space-2);
+  padding: var(--rl-space-2) var(--rl-space-1);
+  color: var(--rl-text-muted);
+  font-size: var(--rl-fs-xs);
+  line-height: 1.45;
+}
+.rl-setups__empty-icon {
+  flex: none;
+  margin-top: 1px;
+  color: var(--rl-accent);
+}
+.rl-setups__empty--search {
+  justify-content: center;
+}
+
+/* ------------------------------------------------------------------------------- list */
+.rl-setups__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0 calc(-1 * var(--rl-space-1));
+}
+.rl-setups__groupbox {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.rl-setups__groupbox + .rl-setups__groupbox {
+  margin-top: 4px;
+}
+.rl-setups__group {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  height: 24px;
+  padding: 0 var(--rl-space-2) 0 6px;
+  border-radius: var(--rl-radius-sm);
+  color: var(--rl-text-faint);
+  font: var(--rl-label-fw) var(--rl-label-fs) / 1 var(--rl-font);
+  letter-spacing: var(--rl-label-ls);
+  text-align: left;
+  text-transform: uppercase;
+}
+.rl-setups__group:hover {
+  background: var(--rl-bg-hover);
+  color: var(--rl-text);
+}
+.rl-setups__chevron {
+  flex: none;
+  transition: transform var(--rl-dur-fast) var(--rl-ease);
+}
+.rl-setups__chevron--open {
+  transform: rotate(90deg);
+}
+.rl-setups__group-name {
+  min-width: 0;
+}
+.rl-setups__group-count {
+  margin-left: auto;
+  color: var(--rl-text-faint);
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+}
+
+.rl-setup {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 5px var(--rl-space-1) 5px 2px;
+  border-radius: var(--rl-radius);
+}
+.rl-setup:hover,
+.rl-setup:focus-within {
+  background: var(--rl-bg-hover);
+}
+.rl-setup--active {
+  background: var(--rl-accent-soft);
+}
+.rl-setup--active::before {
+  content: '';
+  position: absolute;
+  top: 6px;
+  bottom: 6px;
+  left: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+  background: var(--rl-accent);
+}
+.rl-setup--modified::before {
+  background: var(--rl-modified);
+}
+.rl-setup__top {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+}
+.rl-setup__marker {
+  display: inline-flex;
+  flex: none;
+  justify-content: center;
+  width: 14px;
+  color: var(--rl-accent);
+}
+.rl-setup--modified .rl-setup__marker {
+  color: var(--rl-modified);
+}
+.rl-setup__main {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.rl-setup__name {
+  font-weight: 600;
+}
+.rl-setup__summary {
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+}
+.rl-setup__apply {
+  flex: none;
+}
+.rl-setup__inline {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rl-setup__inline > .rl-input {
+  width: 100%;
+}
+.rl-setup__editor {
+  margin-left: 20px;
+}
+.rl-setup__sites {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.rl-setup__site {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--rl-space-1);
+  min-width: 0;
+  padding: 1px 2px 1px 7px;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius-sm);
+  background: var(--rl-bg-elev);
+  font-size: var(--rl-fs-xs);
+}
+.rl-setup__site-add {
+  display: flex;
+  gap: var(--rl-space-1);
+}
+.rl-setup__site-add > .rl-input {
+  flex: 1 1 auto;
+}
+.rl-setups__add-host {
+  min-width: 0;
+  max-width: 70%;
+}
+
+@media (forced-colors: active) {
+  .rl-setups-btn__dot {
+    background: CanvasText;
+    box-shadow: none;
+  }
+  .rl-setup--active {
+    outline: 1px solid Highlight;
+    outline-offset: -1px;
+  }
+  .rl-setup--active::before {
+    background: Highlight;
+  }
+  .rl-setups__save-open {
+    border-color: CanvasText;
+  }
+}

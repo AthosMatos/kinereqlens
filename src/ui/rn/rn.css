@@ -1,0 +1,85 @@
+/* React Native: the standalone tab's full-tab panel and app picker, Settings → React Native. */
+
+.rl-panel--standalone {
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+.rl-panel--standalone .rl-header {
+  cursor: default;
+}
+
+.rl-rn-targets {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  flex: 0 1 auto;
+  max-width: 420px;
+  height: 22px;
+  padding: 0 8px;
+  border: 1px solid var(--rl-border);
+  border-radius: 999px;
+  background: var(--rl-bg-sunken);
+  font: 500 var(--rl-fs-xs) / 1 var(--rl-font);
+  color: var(--rl-text-muted);
+}
+.rl-rn-targets__dot {
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--rl-text-faint);
+}
+.rl-rn-targets__dot--on {
+  background: var(--rl-ok);
+  box-shadow: 0 0 0 3px var(--rl-ok-soft);
+}
+.rl-rn-targets__label {
+  min-width: 0;
+  color: var(--rl-text);
+}
+.rl-rn-targets__select {
+  min-width: 0;
+  max-width: 340px;
+  height: 18px;
+  padding: 0 18px 0 4px;
+  border: 0;
+  background-color: transparent;
+  font: inherit;
+  color: var(--rl-text);
+}
+.rl-rn-targets__idle,
+.rl-rn-targets__dropped {
+  white-space: nowrap;
+}
+
+.rl-rn__apps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.rl-rn__app {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  font-size: var(--rl-fs-sm);
+}
+.rl-rn__app .rl-claude__dot {
+  background: var(--rl-ok);
+}
+.rl-rn__token .rl-export-cmd__text {
+  user-select: all;
+}
+.rl-rn__hint {
+  font-size: var(--rl-fs-xs);
+  line-height: 1.45;
+}
+.rl-rn__hint code,
+.rl-rn__hint strong {
+  font-size: inherit;
+}

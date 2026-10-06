@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>kineReqLens — React Native</title>
+    <link rel="icon" href="icons/icon-32.png" />
+    <!-- Lato, the Kinebot app font (SIL OFL 1.1: fonts/OFL.txt). Declared here, at document level: @font-face rules
+         in the shadow root's adopted sheet are ignored, while families declared by the document reach the shadow tree. -->
+    <style>
+      @font-face { font-family: 'Lato'; font-style: normal; font-weight: 400; font-display: swap; src: url('fonts/Lato-Regular.ttf') format('truetype'); }
+      @font-face { font-family: 'Lato'; font-style: normal; font-weight: 600; font-display: swap; src: url('fonts/Lato-Semibold.ttf') format('truetype'); }
+    </style>
+    <!-- The panel's surface colours (styles/tokens.css) until the UI renders. -->
+    <style>
+      html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #ffffff; }
+      @media (prefers-color-scheme: dark) { html, body { background: #1c1d21; } }
+    </style>
+  </head>
+  <body>
+    <div id="reqlens-panel"></div>
+    <script src="standalone.js"></script>
+  </body>
+</html>

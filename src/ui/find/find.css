@@ -1,0 +1,400 @@
+/* Find in page (docs/ARCHITECTURE.md §13): locate icons and status of the JSON viewer, revealed-node flash, and the
+ * "Where does this come from?" button + results popover of the request list. */
+
+/* ---------------------------------------------------------------- locate icon */
+.rl-find-icon {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  margin: 1px 0 0 6px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--rl-accent) 16%, transparent);
+  color: var(--rl-accent);
+  cursor: pointer;
+  transition:
+    background var(--rl-dur-fast) var(--rl-ease),
+    color var(--rl-dur-fast) var(--rl-ease),
+    transform var(--rl-dur-fast) var(--rl-ease);
+}
+.rl-find-icon:hover {
+  background: var(--rl-accent);
+  color: var(--rl-accent-contrast);
+}
+.rl-find-icon:active {
+  transform: scale(0.9);
+}
+.rl-find-icon:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: 1px;
+}
+/* Only in attributes (a link / image URL): a dashed ring. */
+.rl-find-icon--attr {
+  background: transparent;
+  outline: 1px dashed var(--rl-accent);
+  outline-offset: -1px;
+}
+.rl-find-icon--attr:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: 1px;
+}
+/* On the page but nothing visible right now. */
+.rl-find-icon--hidden {
+  background: transparent;
+  color: var(--rl-text-faint);
+  box-shadow: inset 0 0 0 1px var(--rl-border-strong);
+}
+.rl-find-icon--hidden:hover {
+  background: var(--rl-bg-hover);
+  color: var(--rl-accent);
+}
+/* Too common to locate: muted, informational. */
+.rl-find-icon--common {
+  background: transparent;
+  color: var(--rl-text-faint);
+  opacity: 0.7;
+  cursor: help;
+}
+.rl-find-icon--common:hover {
+  background: transparent;
+  color: var(--rl-text-muted);
+}
+.rl-find-icon--common:active {
+  transform: none;
+}
+
+/* Screenshot of the element showing a value (a JSON row action, FindParts.tsx FindCaptureButton). */
+.rl-find-capture {
+  color: var(--rl-accent);
+}
+.rl-find-capture:hover {
+  border-color: var(--rl-accent);
+  background: var(--rl-accent-soft);
+  color: var(--rl-accent);
+}
+
+/* A node revealed from the page or from "Where does this come from?". */
+.rl-jv__row--flash {
+  animation: rl-find-flash 1.5s var(--rl-ease) 1;
+}
+@keyframes rl-find-flash {
+  0%,
+  35% {
+    background: var(--rl-accent-soft);
+    box-shadow: inset 3px 0 0 var(--rl-accent);
+  }
+  100% {
+    background: transparent;
+    box-shadow: inset 0 0 0 transparent;
+  }
+}
+
+/* ---------------------------------------------------------------- toolbar status */
+.rl-find-status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 2px;
+  max-width: 100%;
+  height: 22px;
+  padding: 0 3px 0 8px;
+  border: 1px solid var(--rl-border);
+  border-radius: 999px;
+  background: var(--rl-bg);
+  color: var(--rl-text-muted);
+  font-family: var(--rl-font);
+  font-size: var(--rl-fs-xs);
+  white-space: nowrap;
+}
+.rl-find-status__label {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+  margin-right: 2px;
+  overflow: hidden;
+  cursor: help;
+}
+.rl-find-status__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.rl-find-status__icon {
+  flex: none;
+  color: var(--rl-accent);
+}
+.rl-find-status--off .rl-find-status__icon,
+.rl-find-status--error .rl-find-status__icon {
+  color: var(--rl-text-faint);
+}
+.rl-find-status--scanning .rl-find-status__icon {
+  animation: rl-find-spin 1.4s linear infinite;
+}
+@keyframes rl-find-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.rl-find-status__dropped {
+  color: var(--rl-warn);
+}
+.rl-find-status__btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--rl-text-faint);
+  cursor: pointer;
+}
+.rl-find-status__btn:hover {
+  background: var(--rl-bg-hover);
+  color: var(--rl-text);
+}
+.rl-find-status__btn:focus-visible,
+.rl-find-toggle:focus-visible {
+  outline: 2px solid var(--rl-focus);
+  outline-offset: 1px;
+}
+.rl-find-toggle {
+  position: relative;
+  flex: none;
+  width: 26px;
+  height: 15px;
+  margin-left: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--rl-border-strong);
+  cursor: pointer;
+  transition: background var(--rl-dur) var(--rl-ease);
+}
+.rl-find-toggle[aria-checked='true'] {
+  background: var(--rl-accent);
+}
+.rl-find-toggle__knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  transition: transform var(--rl-dur) var(--rl-ease);
+}
+.rl-find-toggle[aria-checked='true'] .rl-find-toggle__knob {
+  transform: translateX(11px);
+}
+
+/* ---------------------------------------------------------------- "Where does this come from?" */
+.rl-find-source-btn--on {
+  background: var(--rl-accent-soft);
+  color: var(--rl-accent);
+}
+.rl-find-source {
+  display: flex;
+  flex-direction: column;
+  width: min(440px, calc(100vw - 16px));
+  max-width: min(440px, calc(100vw - 16px));
+  padding: 0 0 var(--rl-space-1);
+  font-size: var(--rl-fs-sm);
+  user-select: text;
+}
+.rl-find-source__head {
+  display: flex;
+  align-items: center;
+  gap: var(--rl-space-2);
+  padding: var(--rl-space-2) var(--rl-space-2) var(--rl-space-1) var(--rl-space-3);
+}
+.rl-find-source__icon {
+  color: var(--rl-accent);
+}
+.rl-find-source__title {
+  font-weight: 600;
+}
+.rl-find-source__query {
+  display: flex;
+  align-items: baseline;
+  gap: var(--rl-space-2);
+  min-width: 0;
+  padding: 0 var(--rl-space-3) var(--rl-space-2);
+  border-bottom: 1px solid var(--rl-border);
+}
+.rl-find-source__text {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rl-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rl-find-source__el {
+  flex: none;
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+}
+.rl-find-source__status {
+  display: flex;
+  align-items: center;
+  gap: var(--rl-space-2);
+  padding: var(--rl-space-3);
+  color: var(--rl-text-muted);
+}
+.rl-find-source__empty {
+  display: flex;
+  flex-direction: column;
+  gap: var(--rl-space-1);
+  padding: var(--rl-space-3);
+  font-size: var(--rl-fs-xs);
+  line-height: 1.45;
+}
+.rl-find-source__empty-title {
+  color: var(--rl-text);
+  font-size: var(--rl-fs-sm);
+  font-weight: 600;
+}
+.rl-find-source__list {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: var(--rl-space-1) 0;
+  overflow: auto;
+  list-style: none;
+}
+.rl-find-source__group + .rl-find-source__group {
+  border-top: 1px solid var(--rl-border);
+}
+.rl-find-source__req,
+.rl-find-source__match {
+  display: flex;
+  align-items: center;
+  gap: var(--rl-space-2);
+  width: 100%;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.rl-find-source__req {
+  padding: var(--rl-space-2) var(--rl-space-3) 2px;
+}
+.rl-find-source__req:disabled {
+  cursor: default;
+}
+.rl-find-source__req:hover:not(:disabled) .rl-find-source__name {
+  color: var(--rl-accent);
+}
+.rl-find-source__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  font-weight: 500;
+}
+.rl-find-source__time {
+  flex: none;
+  font-size: var(--rl-fs-xs);
+}
+.rl-find-source__matches {
+  margin: 0;
+  padding: 0 var(--rl-space-2) var(--rl-space-2) calc(var(--rl-space-3) + 6px);
+  list-style: none;
+}
+.rl-find-source__match {
+  height: 24px;
+  padding: 0 var(--rl-space-2);
+  border-radius: var(--rl-radius-sm);
+  font-size: var(--rl-fs-xs);
+}
+.rl-find-source__match:hover,
+.rl-find-source__match:focus-visible {
+  background: var(--rl-accent-soft);
+  outline: none;
+}
+.rl-find-source__path {
+  flex: none;
+  max-width: 45%;
+  overflow: hidden;
+  color: var(--rl-json-key);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rl-find-source__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rl-json-string);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rl-find-source__how {
+  flex: none;
+  padding: 0 5px;
+  border-radius: 999px;
+  background: var(--rl-bg-sunken);
+  color: var(--rl-text-faint);
+  font-size: 10.5px;
+  line-height: 16px;
+}
+.rl-find-source__how--3 {
+  background: var(--rl-accent-soft);
+  color: var(--rl-accent);
+}
+.rl-find-source__more {
+  padding: 2px var(--rl-space-2);
+  font-size: var(--rl-fs-xs);
+}
+.rl-find-source__foot {
+  display: flex;
+  align-items: center;
+  gap: var(--rl-space-2);
+  padding: var(--rl-space-2) var(--rl-space-3) var(--rl-space-1);
+  border-top: 1px solid var(--rl-border);
+}
+.rl-find-source__searched {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rl-fs-xs);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-jv__row--flash,
+  .rl-find-status--scanning .rl-find-status__icon {
+    animation: none;
+  }
+}
+
+@media (forced-colors: active) {
+  .rl-find-icon,
+  .rl-find-icon--attr,
+  .rl-find-icon--hidden {
+    border: 1px solid ButtonText;
+    color: ButtonText;
+  }
+  .rl-find-icon--visible {
+    background: Highlight;
+    color: HighlightText;
+  }
+  .rl-find-toggle {
+    border: 1px solid ButtonText;
+  }
+  .rl-find-toggle[aria-checked='true'] {
+    background: Highlight;
+  }
+  .rl-jv__row--flash {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+}

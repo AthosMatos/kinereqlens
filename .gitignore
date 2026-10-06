@@ -1,0 +1,9 @@
+node_modules/
+dist/
+dist-e2e*/
+*.zip
+test-results*/
+playwright-report/
+.e2e-profile*/
+.DS_Store
+mcp/dist/

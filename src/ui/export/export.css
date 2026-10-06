@@ -1,0 +1,723 @@
+/* OWNER: ui-export agent. Export tab (types / agent prompt), the code view, Settings → Claude Code and the
+ * "Claude" origin badge of the run history. Uses the shared tokens; adds code-colour tokens per theme. */
+
+/* ------------------------------------------------------------------------------------- code colours */
+.rl-root[data-theme='light'] {
+  --rl-code-kw: #b4235a;
+  --rl-code-type: #0b6e83;
+  --rl-code-fn: #1f47c4;
+  --rl-code-bg: #f8f8f8;
+  --rl-code-gutter: #8f8f8f;
+  --rl-code-inline: rgba(0, 0, 0, 0.06);
+}
+.rl-root[data-theme='dark'] {
+  --rl-code-kw: #f58cb4;
+  --rl-code-type: #5fd0e0;
+  --rl-code-fn: #93a8ec;
+  --rl-code-bg: #17181c;
+  --rl-code-gutter: #66686d;
+  --rl-code-inline: rgba(255, 255, 255, 0.07);
+}
+
+/* ------------------------------------------------------------------------------------------ layout */
+.rl-export {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--rl-bg);
+  color: var(--rl-text);
+  font-size: var(--rl-fs-sm);
+}
+.rl-export__tabs {
+  padding: 0 var(--rl-space-2);
+  background: var(--rl-bg);
+}
+.rl-export__tabs .rl-tabs__actions {
+  gap: var(--rl-space-2);
+  min-width: 0;
+  padding-right: 2px;
+}
+.rl-export__body,
+.rl-export__view {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+}
+/* In a short (stacked) results pane the whole view scrolls; the footer with the actions stays pinned. */
+.rl-export__view {
+  overflow: auto;
+  overscroll-behavior: contain;
+}
+
+.rl-export__toolbar {
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--rl-space-1) var(--rl-space-3);
+  min-height: var(--rl-row-h);
+  padding: 5px var(--rl-space-3);
+  border-bottom: 1px solid var(--rl-border);
+  background: var(--rl-bg-elev);
+}
+.rl-export__toolbar--parts {
+  gap: 3px var(--rl-space-3);
+  padding-top: 4px;
+  padding-bottom: 4px;
+  background: var(--rl-bg);
+}
+.rl-export__label {
+  color: var(--rl-text-faint);
+  font: var(--rl-label-fw) var(--rl-label-fs) / 1 var(--rl-font);
+  letter-spacing: var(--rl-label-ls);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+/* Pushed to the end of the row (and of the wrapped row in narrow panes). */
+.rl-export__annotate {
+  margin-left: auto;
+}
+
+/* Compact segmented control (auto-width items). */
+.rl-export-seg {
+  flex: none;
+  padding: 1px;
+}
+.rl-export-seg .rl-segmented__item {
+  flex: 0 0 auto;
+  height: 22px;
+  padding: 0 9px;
+  font-size: var(--rl-fs-xs);
+  white-space: nowrap;
+}
+.rl-export-seg .rl-segmented__item:focus-visible {
+  outline-offset: -1px;
+}
+
+/* Base name */
+.rl-export__name {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 160px;
+  min-width: 0;
+  max-width: 280px;
+}
+.rl-export__name-input {
+  flex: 1 1 auto;
+  width: 100%;
+  min-width: 80px;
+  height: 24px;
+  font-size: var(--rl-fs-sm);
+}
+
+/* Checkboxes */
+.rl-export-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--rl-text);
+  font-size: var(--rl-fs-xs);
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+}
+.rl-export-check .rl-checkbox {
+  width: 13px;
+  height: 13px;
+}
+.rl-export-check--disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* Notices */
+.rl-export__notice {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: var(--rl-space-2);
+  margin: var(--rl-space-2) var(--rl-space-3) 0;
+  font-size: var(--rl-fs-xs);
+}
+.rl-export__notice--info {
+  padding: 5px 6px 5px 10px;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-bg-sunken);
+  color: var(--rl-text);
+  line-height: 1.4;
+}
+.rl-export__notice-icon {
+  flex: none;
+  color: var(--rl-info);
+}
+.rl-export__notice-text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.rl-export__notice.rl-error {
+  align-items: flex-start;
+}
+
+/* States */
+.rl-export__state {
+  gap: var(--rl-space-2);
+  min-height: 120px;
+}
+.rl-export__state-icon--error {
+  color: var(--rl-danger);
+}
+.rl-export__state-detail {
+  max-width: 100%;
+  font-size: var(--rl-fs-xs);
+  overflow-wrap: anywhere;
+}
+.rl-export__busy {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+  white-space: nowrap;
+}
+.rl-export__busy-spinner,
+.rl-export__btn-spinner {
+  width: 10px;
+  height: 10px;
+  border-width: 1.5px;
+}
+
+/* Redaction indicator (opens Settings → Claude Code) */
+.rl-export-redact {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex: none;
+  height: 20px;
+  padding: 0 7px;
+  border: 1px solid transparent;
+  border-radius: var(--rl-radius-pill);
+  font: 600 var(--rl-fs-xs) / 1 var(--rl-font);
+  white-space: nowrap;
+  transition:
+    border-color var(--rl-dur-fast) ease,
+    filter var(--rl-dur-fast) ease;
+}
+.rl-export-redact--on {
+  background: var(--rl-ok-soft);
+  color: var(--rl-ok);
+}
+.rl-export-redact--off {
+  background: var(--rl-warn-soft);
+  color: var(--rl-warn);
+}
+.rl-export-redact:hover {
+  border-color: currentColor;
+}
+
+/* ------------------------------------------------------------------------------------- code view */
+.rl-code {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: 96px;
+  margin: var(--rl-space-2) var(--rl-space-3) 0;
+  overflow: auto;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius-lg);
+  background: var(--rl-code-bg);
+  color: var(--rl-text);
+  font-size: 12px;
+  line-height: 1.6;
+}
+.rl-code:focus-visible {
+  outline-offset: -2px;
+}
+.rl-code__inner {
+  display: flex;
+  align-items: flex-start;
+  width: max-content;
+  min-width: 100%;
+}
+.rl-code__gutter {
+  position: sticky;
+  left: 0;
+  z-index: 1;
+  flex: none;
+  align-self: stretch;
+  min-width: 3.2em;
+  padding: 8px 10px 8px 8px;
+  border-right: 1px solid var(--rl-border);
+  background: var(--rl-code-bg);
+  color: var(--rl-code-gutter);
+  font-size: 11px;
+  line-height: calc(12px * 1.6);
+  text-align: right;
+  white-space: pre;
+  user-select: none;
+  font-variant-numeric: tabular-nums;
+}
+.rl-code__pre {
+  flex: 1 0 auto;
+  margin: 0;
+  padding: 8px 12px;
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre;
+  tab-size: 2;
+}
+.rl-code__pre > code {
+  font: inherit;
+}
+.rl-code--wrap .rl-code__inner {
+  width: auto;
+}
+.rl-code--wrap .rl-code__pre {
+  flex: 1 1 auto;
+  min-width: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.rl-code .rl-resp-more {
+  position: sticky;
+  left: 0;
+  background: var(--rl-code-bg);
+}
+
+.rl-tok--kw {
+  color: var(--rl-code-kw);
+}
+.rl-tok--type {
+  color: var(--rl-code-type);
+}
+.rl-tok--key {
+  color: var(--rl-json-key);
+}
+.rl-tok--str {
+  color: var(--rl-json-string);
+}
+.rl-tok--num {
+  color: var(--rl-json-number);
+}
+.rl-tok--lit {
+  color: var(--rl-json-bool);
+}
+.rl-tok--fn {
+  color: var(--rl-code-fn);
+}
+.rl-tok--com {
+  color: var(--rl-text-faint);
+  font-style: italic;
+}
+/* Agent prompt (markdown) */
+.rl-tok--h {
+  color: var(--rl-accent);
+  font-weight: 700;
+}
+.rl-tok--fence {
+  color: var(--rl-text-faint);
+}
+.rl-tok--code {
+  border-radius: var(--rl-radius-xs);
+  background: var(--rl-code-inline);
+  color: var(--rl-json-key);
+}
+
+/* ------------------------------------------------------------------------------------------ notes */
+.rl-export__notes {
+  flex: none;
+  margin: var(--rl-space-2) var(--rl-space-3) 0;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-bg-sunken);
+}
+.rl-export__notes-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 24px;
+  padding: 0 8px;
+  color: var(--rl-text-muted);
+  font: 600 var(--rl-fs-xs) / 1 var(--rl-font);
+  text-align: left;
+}
+.rl-export__notes-toggle:hover {
+  color: var(--rl-text);
+}
+.rl-export__notes-toggle:focus-visible {
+  outline-offset: -2px;
+}
+.rl-export__notes-list {
+  max-height: 96px;
+  padding: 0 10px 6px 26px;
+  list-style: disc;
+}
+.rl-export__note {
+  padding: 1px 0;
+  color: var(--rl-text);
+  font-size: var(--rl-fs-xs);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.rl-export__note::marker {
+  color: var(--rl-warn);
+}
+
+/* ----------------------------------------------------------------------------------------- footer */
+.rl-export__footer {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  display: flex;
+  flex: none;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px var(--rl-space-2);
+  min-height: calc(var(--rl-row-h) + 8px);
+  margin-top: var(--rl-space-2);
+  padding: 5px var(--rl-space-3);
+  border-top: 1px solid var(--rl-border);
+  background: var(--rl-bg-elev);
+}
+.rl-export__meta {
+  min-width: 0;
+  overflow: hidden;
+  font-size: var(--rl-fs-xs);
+  font-variant-numeric: tabular-nums;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rl-export__session {
+  max-width: 180px;
+  height: 22px;
+  font-size: var(--rl-fs-xs);
+}
+.rl-export__reason {
+  display: flex;
+  flex: 1 0 100%;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+  color: var(--rl-text-muted);
+  font-size: var(--rl-fs-xs);
+  line-height: 1.35;
+  text-align: right;
+}
+.rl-export__reason-icon {
+  flex: none;
+  color: var(--rl-text-faint);
+}
+.rl-export__reason-text {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Inline text button ("Set up", "Grant permission") */
+.rl-export-link {
+  flex: none;
+  padding: 0 2px;
+  border-radius: var(--rl-radius-xs);
+  color: var(--rl-accent);
+  font: 600 var(--rl-fs-xs) / 1.35 var(--rl-font);
+  white-space: nowrap;
+}
+.rl-export-link:hover:not(:disabled) {
+  text-decoration: underline;
+}
+.rl-export-link:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Copy feedback */
+.rl-export-copied .rl-icon {
+  color: var(--rl-ok);
+}
+.rl-btn--primary.rl-export-copied .rl-icon {
+  color: inherit;
+}
+
+/* ----------------------------------------------------------------------- Settings → Claude Code */
+.rl-claude {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 -14px;
+  padding: 12px 14px 2px;
+  border-top: 1px solid var(--rl-border);
+  border-radius: 0;
+  outline: none;
+}
+.rl-claude--flash {
+  animation: rl-claude-flash 1.2s var(--rl-ease);
+}
+@keyframes rl-claude-flash {
+  from {
+    background: var(--rl-accent-soft);
+  }
+}
+.rl-claude__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.rl-claude__head > .rl-settings__title {
+  flex: none;
+  white-space: nowrap;
+  line-height: 20px;
+}
+.rl-claude__status {
+  display: inline-flex;
+  flex: 0 1 auto;
+  align-items: baseline;
+  gap: 5px;
+  min-width: 0;
+  min-height: 20px;
+  padding: 4px 8px;
+  border-radius: var(--rl-radius-pill);
+  background: var(--rl-bg-sunken);
+  color: var(--rl-text-muted);
+  font: 600 var(--rl-fs-xs) / 1 var(--rl-font);
+}
+.rl-claude__dot {
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  transform: translateY(-1px);
+}
+.rl-claude__label {
+  min-width: 0;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+.rl-claude__spinner {
+  align-self: center;
+  width: 10px;
+  height: 10px;
+  border-width: 1.5px;
+}
+.rl-claude__status--ok {
+  background: var(--rl-ok-soft);
+  color: var(--rl-ok);
+}
+.rl-claude__status--warn {
+  background: var(--rl-warn-soft);
+  color: var(--rl-warn);
+}
+.rl-claude__status--error {
+  background: var(--rl-danger-soft);
+  color: var(--rl-danger);
+}
+.rl-claude__status--busy {
+  color: var(--rl-info);
+}
+.rl-claude__status--off .rl-claude__dot {
+  opacity: 0.6;
+}
+.rl-claude__detail {
+  margin-top: -2px;
+  color: var(--rl-text-muted);
+  font-size: var(--rl-fs-xs);
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+.rl-claude__detail .rl-export-link {
+  margin-left: 4px;
+}
+
+.rl-claude__setup {
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-bg-sunken);
+}
+.rl-claude__summary {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  height: 26px;
+  padding: 0 8px;
+  color: var(--rl-text);
+  font: 600 var(--rl-fs-xs) / 1 var(--rl-font);
+  list-style: none;
+  cursor: pointer;
+  user-select: none;
+}
+.rl-claude__summary::-webkit-details-marker {
+  display: none;
+}
+.rl-claude__summary:focus-visible {
+  outline-offset: -2px;
+  border-radius: var(--rl-radius-sm);
+}
+.rl-claude__chevron {
+  color: var(--rl-text-faint);
+  transition: transform var(--rl-dur-fast) ease;
+}
+.rl-claude__setup[open] .rl-claude__chevron {
+  transform: rotate(90deg);
+}
+.rl-claude__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 2px 8px 10px 8px;
+  counter-reset: rl-claude-step;
+}
+.rl-claude__step {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  min-width: 0;
+  padding-left: 22px;
+  counter-increment: rl-claude-step;
+}
+.rl-claude__step::before {
+  content: counter(rl-claude-step);
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: grid;
+  place-content: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--rl-accent-soft);
+  color: var(--rl-accent);
+  font: 700 10px / 1 var(--rl-font);
+}
+.rl-claude__step-title {
+  color: var(--rl-text);
+  font-size: var(--rl-fs-xs);
+  line-height: 1.4;
+}
+.rl-claude__id,
+.rl-claude__hint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-width: 0;
+  font-size: var(--rl-fs-xs);
+  line-height: 1.4;
+}
+.rl-claude__id {
+  white-space: nowrap;
+}
+.rl-claude__id code {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--rl-text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  user-select: all;
+}
+
+.rl-export-cmd {
+  display: flex;
+  align-items: flex-start;
+  gap: 4px;
+  min-width: 0;
+  padding: 5px 4px 5px 8px;
+  border: 1px solid var(--rl-border);
+  border-radius: var(--rl-radius);
+  background: var(--rl-bg);
+}
+.rl-export-cmd__text {
+  flex: 1 1 auto;
+  min-width: 0;
+  color: var(--rl-text);
+  font-size: 11px;
+  line-height: 1.5;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  user-select: all;
+}
+.rl-export-cmd .rl-icon-btn {
+  margin-top: -1px;
+}
+
+.rl-claude__warning {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: -4px 0 2px 22px;
+  color: var(--rl-text-faint);
+  font-size: var(--rl-fs-xs);
+  line-height: 1.45;
+}
+.rl-claude__warning-icon {
+  flex: none;
+  margin-top: 2px;
+}
+.rl-claude__warning--active {
+  color: var(--rl-text);
+}
+.rl-claude__warning--active .rl-claude__warning-icon {
+  color: var(--rl-warn);
+}
+
+/* Settings → Claude Code → Recent Claude actions (the control tools' trace). */
+.rl-claude__trace {
+  margin-top: 4px;
+}
+.rl-claude__trace-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 4px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--rl-fs-xs);
+}
+.rl-claude__trace-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  color: var(--rl-text);
+}
+.rl-claude__trace-what {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.rl-claude__trace-failed {
+  color: var(--rl-danger);
+}
+
+/* ------------------------------------------------------------------------- run history origin badge */
+.rl-run-origin {
+  display: inline-flex;
+  align-items: center;
+  height: 16px;
+  margin-right: 6px;
+  padding: 0 6px;
+  border-radius: var(--rl-radius-pill);
+  background: var(--rl-accent-soft);
+  color: var(--rl-accent);
+  font: 700 10px / 1 var(--rl-font);
+  letter-spacing: 0.02em;
+  vertical-align: 1px;
+}
+
+@media (forced-colors: active) {
+  .rl-export-redact,
+  .rl-claude__status,
+  .rl-run-origin {
+    border: 1px solid CanvasText;
+  }
+}

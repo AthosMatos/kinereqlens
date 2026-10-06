@@ -1,0 +1,41 @@
+{
+  "name": "@kinebot/kinereqlens-react-native",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Stream a React Native app's fetch / XMLHttpRequest / WebSocket traffic to kineReqLens on the developer's machine (inspect, edit, replay).",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/index.cjs",
+  "types": "dist/index.d.ts",
+  "react-native": "src/index.ts",
+  "source": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "react-native": "./src/index.ts",
+      "default": "./dist/index.cjs"
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "src",
+    "dist",
+    "README.md",
+    "PROTOCOL.md"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node build.mjs",
+    "typecheck": "node ../node_modules/typescript/bin/tsc -p tsconfig.json",
+    "test": "node ../node_modules/vitest/vitest.mjs run --config vitest.config.ts",
+    "receiver": "node test/receiver-cli.ts"
+  },
+  "peerDependencies": {
+    "react-native": ">=0.70"
+  },
+  "peerDependenciesMeta": {
+    "react-native": {
+      "optional": true
+    }
+  }
+}

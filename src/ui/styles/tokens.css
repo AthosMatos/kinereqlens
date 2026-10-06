@@ -1,0 +1,214 @@
+/* OWNER: ui-shell agent. Design tokens (CSS custom properties) for light and dark themes.
+ *
+ * Tokens live on .rl-root (inside the shadow root) rather than :host, so page CSS can never override them
+ * through inheritance. Every theme-independent token is declared once; colors per data-theme.
+ *
+ * Palette: the Kinebot product ecosystem (KineMeet, Kineloop), sampled pixel by pixel from their screenshots —
+ * docs/design/kine-ecosystem.md lists every value and where it came from. Neutral greys (no navy), one accent hue
+ * (225°: Kinebot blue in light, KineMeet periwinkle in dark), avatar-style tints for methods and statuses. */
+
+.rl-root {
+  /* Type. Lato (the Kinebot app font) is declared with @font-face by the document hosting the shadow root
+     (static/panel.html, static/app.html): fonts cannot be declared from adopted shadow-root sheets. */
+  --rl-font: 'Lato', -apple-system, BlinkMacSystemFont, 'Segoe UI Variable Text', 'Segoe UI', system-ui, Roboto,
+    'Helvetica Neue', Arial, sans-serif;
+  --rl-font-mono: ui-monospace, 'Cascadia Code', 'Cascadia Mono', 'SF Mono', SFMono-Regular, Menlo, Consolas,
+    'Liberation Mono', monospace;
+  --rl-fs-xs: 11px;
+  --rl-fs-sm: 12px;
+  --rl-fs-md: 13px;
+  --rl-fs-lg: 15px;
+  /* Section headers ("TEXT ROOMS", "PROPRIEDADES"): small, uppercase, letter-spaced, faint. */
+  --rl-label-fs: 10.5px;
+  --rl-label-fw: 600;
+  --rl-label-ls: 0.06em;
+
+  /* Shape: controls 8, cards / panels / rail buttons 12, chips / badges / counters pills. */
+  --rl-radius-xs: 4px;
+  --rl-radius-sm: 6px;
+  --rl-radius: 8px;
+  --rl-radius-lg: 12px;
+  --rl-radius-xl: 16px;
+  --rl-radius-pill: 999px;
+  --rl-space-1: 4px;
+  --rl-space-2: 8px;
+  --rl-space-3: 12px;
+  --rl-space-4: 16px;
+  --rl-space-5: 20px;
+  /* Control rhythm (editor rows, history rows). The request list overrides it with --rl-list-row-h; its virtualizer
+     reads the computed --rl-row-h of the list (RequestList.tsx readRowHeight). */
+  --rl-row-h: 28px;
+  --rl-list-row-h: 30px;
+
+  /* Motion (zeroed under prefers-reduced-motion) */
+  --rl-ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --rl-dur-fast: 90ms;
+  --rl-dur: 160ms;
+}
+
+/* ---------------------------------------------------------------- light */
+.rl-root[data-theme='light'] {
+  /* KineMeet light + Kineloop light: white content, very light grey sidebar / rail, light grey tiles, Kinebot blue. */
+  color-scheme: light;
+  --rl-bg: #ffffff;
+  --rl-bg-elev: #ffffff;
+  --rl-bg-sunken: #f8f8f8;
+  --rl-bg-hover: #f2f2f2;
+  --rl-bg-active: #e7e7e7;
+  --rl-header-bg: #ffffff;
+  --rl-rail-bg: #f0f0f0;
+  --rl-rail-hover: #e7e7e7;
+  --rl-rail-active: #ffffff;
+  --rl-sidebar-bg: #f8f8f8;
+  --rl-list-hover: #f3f3f3;
+  --rl-list-sel: #f0f0f0;
+  --rl-tile: #e7e7e7;
+  --rl-btn-bg: #f0f0f0;
+  --rl-btn-hover: #e7e7e7;
+  --rl-border: #e7e7e7;
+  --rl-border-strong: #d9d9d9;
+  --rl-text: #1f1f1f;
+  --rl-text-strong: #1f1f1f;
+  --rl-text-muted: #4f4f4f;
+  --rl-text-faint: #666666;
+  --rl-wordmark-kine: #4d4d4f;
+  --rl-accent: #0230bb;
+  --rl-accent-contrast: #ffffff;
+  --rl-accent-fill: #0230bb;
+  --rl-accent-fill-text: #ffffff;
+  --rl-accent-soft: #e5eaf8;
+  --rl-danger: #c42a3b;
+  --rl-danger-fill: #c42a3b;
+  --rl-danger-soft: #fbebec;
+  --rl-warn: #8a5700;
+  --rl-warn-soft: #fbf0dc;
+  --rl-ok: #257a37;
+  --rl-ok-soft: #e6f8e9;
+  --rl-info: #0230bb;
+  --rl-modified: #e09400;
+  --rl-focus: rgba(2, 48, 187, 0.42);
+  --rl-shadow: 0 16px 44px -12px rgba(0, 0, 0, 0.2), 0 4px 12px -2px rgba(0, 0, 0, 0.07), 0 0 0 1px rgba(0, 0, 0, 0.04);
+  --rl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.08);
+
+  /* Avatar tints (KineMeet participants: pastel bg + strong text) for method badges and status pills. */
+  --rl-tint-green-bg: #e6f8e9;
+  --rl-tint-green-fg: #257a37;
+  --rl-tint-blue-bg: #e5eaf8;
+  --rl-tint-blue-fg: #0230bb;
+  --rl-tint-purple-bg: #f3ebf7;
+  --rl-tint-purple-fg: #592594;
+  --rl-tint-red-bg: #fbebec;
+  --rl-tint-red-fg: #c42a3b;
+  --rl-tint-amber-bg: #fbf0dc;
+  --rl-tint-amber-fg: #8a5700;
+  --rl-tint-neutral-bg: #f0f0f0;
+  --rl-tint-neutral-fg: #4f4f4f;
+
+  --rl-m-get: #257a37;
+  --rl-m-post: #8a5700;
+  --rl-m-put: #0230bb;
+  --rl-m-patch: #592594;
+  --rl-m-delete: #c42a3b;
+  --rl-m-other: #4f4f4f;
+
+  --rl-json-key: #0230bb;
+  --rl-json-string: #257a37;
+  --rl-json-number: #a24d00;
+  --rl-json-bool: #592594;
+  --rl-json-null: #666666;
+  --rl-diff-add: rgba(37, 160, 70, 0.13);
+  --rl-diff-del: rgba(196, 42, 59, 0.11);
+
+  --rl-scrollbar: rgba(0, 0, 0, 0.2);
+  --rl-scrollbar-hover: rgba(0, 0, 0, 0.34);
+  --rl-backdrop: rgba(0, 0, 0, 0.06);
+  --rl-dock-shadow: rgba(0, 0, 0, 0.22);
+}
+
+/* ---------------------------------------------------------------- dark */
+.rl-root[data-theme='dark'] {
+  /* KineMeet dark + Kineloop dark: neutral charcoal, rail darkest, then sidebar, content, cards; periwinkle. */
+  color-scheme: dark;
+  --rl-bg: #1c1d21;
+  --rl-bg-elev: #222328;
+  --rl-bg-sunken: #17181c;
+  --rl-bg-hover: #2a2b31;
+  --rl-bg-active: #2f3039;
+  --rl-header-bg: #1c1d21;
+  --rl-rail-bg: #121416;
+  --rl-rail-hover: #1c1d21;
+  --rl-rail-active: #25262c;
+  --rl-sidebar-bg: #17181c;
+  --rl-list-hover: #1f2025;
+  --rl-list-sel: #25262c;
+  --rl-tile: #2f3039;
+  --rl-btn-bg: #2a2b31;
+  --rl-btn-hover: #33343b;
+  --rl-border: #2d2f33;
+  --rl-border-strong: #3b3d42;
+  --rl-text: #dcdedf;
+  --rl-text-strong: #f5f7fb;
+  --rl-text-muted: #b4b6b9;
+  --rl-text-faint: #909294;
+  --rl-wordmark-kine: #f0f0f0;
+  /* Periwinkle for text, icons and markers (KineMeet #6d88dc, 2 % lighter so text stays AA on every surface);
+     the primary-button fill is the same hue, deep enough for white text. */
+  --rl-accent: #7891de;
+  --rl-accent-contrast: #121416;
+  --rl-accent-fill: #4e70d4;
+  --rl-accent-fill-text: #ffffff;
+  --rl-accent-soft: #1e2840;
+  --rl-danger: #f0838e;
+  --rl-danger-fill: #c43d4b;
+  --rl-danger-soft: #422a30;
+  --rl-warn: #e9b44c;
+  --rl-warn-soft: #3d3221;
+  --rl-ok: #72cf89;
+  --rl-ok-soft: #243b2a;
+  --rl-info: #7891de;
+  --rl-modified: #f5b93c;
+  --rl-focus: rgba(120, 145, 222, 0.6);
+  --rl-shadow: 0 22px 56px -12px rgba(0, 0, 0, 0.66), 0 4px 14px -2px rgba(0, 0, 0, 0.42), 0 0 0 1px rgba(255, 255, 255, 0.05);
+  --rl-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+
+  /* Avatar tints (KineMeet participants: deep-tinted bg + light coloured text). */
+  --rl-tint-green-bg: #243b2a;
+  --rl-tint-green-fg: #b9dcbe;
+  --rl-tint-blue-bg: #1e2840;
+  --rl-tint-blue-fg: #a3b5ef;
+  --rl-tint-purple-bg: #332845;
+  --rl-tint-purple-fg: #d5c0f0;
+  --rl-tint-red-bg: #422a30;
+  --rl-tint-red-fg: #f0a0a8;
+  --rl-tint-amber-bg: #3d3221;
+  --rl-tint-amber-fg: #f0c878;
+  --rl-tint-neutral-bg: #2f3039;
+  --rl-tint-neutral-fg: #c6c8cb;
+
+  --rl-m-get: #72cf89;
+  --rl-m-post: #e9b44c;
+  --rl-m-put: #7891de;
+  --rl-m-patch: #c3a6ef;
+  --rl-m-delete: #f0838e;
+  --rl-m-other: #b4b6b9;
+
+  --rl-json-key: #93a8ec;
+  --rl-json-string: #7fd496;
+  --rl-json-number: #f0b45a;
+  --rl-json-bool: #c3a6ef;
+  --rl-json-null: #909294;
+  --rl-diff-add: rgba(114, 207, 137, 0.15);
+  --rl-diff-del: rgba(240, 131, 142, 0.16);
+
+  --rl-scrollbar: rgba(255, 255, 255, 0.17);
+  --rl-scrollbar-hover: rgba(255, 255, 255, 0.3);
+  --rl-backdrop: rgba(0, 0, 0, 0.24);
+  --rl-dock-shadow: rgba(0, 0, 0, 0.6);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rl-root {
+    --rl-dur-fast: 0ms;
+    --rl-dur: 0ms;
+  }
+}
